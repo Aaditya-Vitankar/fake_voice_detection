@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Results</title>
+</head>
+<body>
+    <div class="container">
+        <div class="results">
+            <p>{{ result_text }}</p>
+            <img src="{{ result_image }}" alt="Result Image">
+        </div>
+    </div>
+</body>
+</html>

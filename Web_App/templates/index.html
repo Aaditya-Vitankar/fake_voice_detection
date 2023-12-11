@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Audio Processing App</title>
+</head>
+<body>
+    <div class="container">
+        <form action="/processing" method="post" enctype="multipart/form-data" id="upload-form">
+            <div class="file-drop" id="file-drop">
+                <p>Drag & Drop your audio file here</p>
+                <input type="file" name="audio_file" id="audio-file" accept=".wav, .mp3" />
+            </div>
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+</body>
+</html>
