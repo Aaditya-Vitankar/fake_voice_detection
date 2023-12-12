@@ -1,14 +1,14 @@
 # ---------------------------------------------------------------------------------------------
-# =============================================================================================
+# Imports
 # ---------------------------------------------------------------------------------------------
 
-###-----------------
-### Import Libraries
-###-----------------
-
 import os
+import logging
+import librosa
 import numpy as np
 import pandas as pd
+from tqdm.notebook import tqdm
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -20,53 +20,33 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, ConfusionMatrixDisplay
 from sklearn.preprocessing import StandardScaler
 
+import tensorflow as tf
+
+from sklearn.utils import shuffle
+
 # import torch
 # import torch.nn as nn
 # import torch.nn.functional as F
 # from torch.autograd import Variable
 
-from sklearn.ensemble import IsolationForest
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import DBSCAN
-from sklearn.metrics import silhouette_score
-
-
-from sklearn.utils import shuffle
-
-import tensorflow as tf
-
 # %matplotlib inline
 
+# for Frature Extraction
 
-## --------------- for Frature Extraction
-import os
-import librosa
-import numpy as np
-import pandas as pd
-from tqdm.notebook import tqdm
 
 # ---------------------------------------------------------------------------------------------
 # =============================================================================================
 # ---------------------------------------------------------------------------------------------
 
-###----------------
 ### Some parameters
-###----------------
 
-inpDir = '/mnt/5866F9FE66F9DCA6/Puneet CDAC-Practice/CDAC_Project/DATA/KAGGLE'
-outDir = '/mnt/5866F9FE66F9DCA6/Puneet CDAC-Practice/CDAC_Project/DATA'
+inpDir = '../../DATA/KAGGLE'
+outDir = '../../DATA'
 subDir = 'csvs'
 audDir = "AUDIO"
 
-RANDOM_STATE = 24 # REMEMBER: to remove at the time of promotion to production
-np.random.seed(RANDOM_STATE) # Set Random Seed for reproducible  results
-
-EPOCHS = 11 # number of epochs
-ALPHA = 0.001 # learning rate
-NUM_SAMPLES = 1280 # How many samples we want to generate 
-NOISE = 0.2 # Noise to be introduced in the data
-TEST_SIZE = 0.2
+RANDOM_STATE = 24               # REMEMBER: to remove at the time of promotion to production
+np.random.seed(RANDOM_STATE)    # Set Random Seed for reproducible  results
 
 # parameters for Matplotlib
 params = {'legend.fontsize': 'x-large',
@@ -85,6 +65,7 @@ plt.rcParams.update(params)
 # ---------------------------------------------------------------------------------------------
 # =============================================================================================
 # ---------------------------------------------------------------------------------------------
+
 
 ''' to Extract feature from audio params:
         file_path : <abs. path of the file(.wav format recoomended)>
@@ -142,8 +123,6 @@ def extract_features(file_path, segment_length):   # Function to extract feature
 # ---------------------------------------------------------------------------------------------
 # =============================================================================================
 # ---------------------------------------------------------------------------------------------
-# Function to create the dataset
-
 
 '''Creates the seprate dataset for each of the audio file
    with the dir name as a suffix as label
@@ -153,7 +132,7 @@ def extract_features(file_path, segment_length):   # Function to extract feature
 '''
 
 
-
+# Function to create the dataset
 def create_dataset_sep(audio_dir, segment_length , csv_output_path):
     
     labels = os.listdir(audio_dir) # Label for y
@@ -176,7 +155,7 @@ def create_dataset_sep(audio_dir, segment_length , csv_output_path):
             # Create a DataFrame with the dataset
             df = pd.DataFrame(feature_list, columns=['chroma_stft', 'rms', 'spectral_centroid', 'spectral_bandwidth', 'rolloff', 'zero_crossing_rate', 'mfcc1', 'mfcc2', 'mfcc3', 'mfcc4', 'mfcc5', 'mfcc6', 'mfcc7', 'mfcc8', 'mfcc9', 'mfcc10', 'mfcc11', 'mfcc12', 'mfcc13', 'mfcc14', 'mfcc15', 'mfcc16', 'mfcc17', 'mfcc18', 'mfcc19', 'mfcc20','LABEL'])
             fn_name = file.rstrip('.wav')
-            csv_output_path = f'./DATA/csvs/{fn_name}_{label}.csv'
+            csv_output_path = f'{csv_output_path}/{fn_name}_{label}.csv'
             df.to_csv(csv_output_path, index=False)
 
             print(f'Dataset created and saved to {csv_output_path}')
@@ -185,15 +164,17 @@ def create_dataset_sep(audio_dir, segment_length , csv_output_path):
 
 # Function to create the dataset
 
-# ---------------------------------------------------------------------------------------------
-# =============================================================================================
-# ---------------------------------------------------------------------------------------------
-
 '''Creates the one sngle dataset for all audio file
    with the dir name as a suffix as label
    audio_dir = str : directory in with the file in
    segment_length : inervel for taking samples
 '''
+
+# ---------------------------------------------------------------------------------------------
+# =============================================================================================
+# ---------------------------------------------------------------------------------------------
+
+
 
 def create_dataset(audio_dir, segment_length):
     
@@ -220,8 +201,6 @@ def create_dataset(audio_dir, segment_length):
     return df
 
 
-## Model
-
 # ---------------------------------------------------------------------------------------------
 # =============================================================================================
 # ---------------------------------------------------------------------------------------------
@@ -241,46 +220,40 @@ def check_GPU():
 # ---------------------------------------------------------------------------------------------
 # =============================================================================================
 # ---------------------------------------------------------------------------------------------
-# train_test_split_DL
 
 
-def split(batch_size = int , test_size = float ,
-          X = pd.DataFrame , y = pd.DataFrame , 
-          label_y = False , shuffle_data = False):
-    
-    ## Finding the lenthh of the test set
-    test_len = (len(X)*test_size)//batch_size
-    test_len = int(test_len * batch_size)
+# Extract Features From Audio
 
-    ## lablel encoding the the dependeable variable
-    ## is specified TRUE
-    
-    if label_y == True:
-        lables = {}
-        for i in enumerate(y.unique()):
-            lables[i[1]] = i[0]
+def create_DataFrame(File_path, segment_length):
+    feature_list =[]
+    file_features = extract_features(File_path, segment_length)
+    if file_features:
+        # Append features of all segments along with the label to the dataset
+        for segment_features in file_features:
+            feature_list.append(segment_features)
+                    
+    # Create a DataFrame with the dataset
+    df = pd.DataFrame(feature_list, columns=['chroma_stft', 'rms', 'spectral_centroid', 'spectral_bandwidth', 'rolloff', 'zero_crossing_rate', 'mfcc1', 'mfcc2', 'mfcc3', 'mfcc4', 'mfcc5', 'mfcc6', 'mfcc7', 'mfcc8', 'mfcc9', 'mfcc10', 'mfcc11', 'mfcc12', 'mfcc13', 'mfcc14', 'mfcc15', 'mfcc16', 'mfcc17', 'mfcc18', 'mfcc19', 'mfcc20'])
+    return df
 
-    print(lables)
+# ---------------------------------------------------------------------------------------------
+# =============================================================================================
+# ---------------------------------------------------------------------------------------------
 
-    y.replace(lables,inplace=True)
+# Logger
+formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
+def setup_logger(name, log_file, level=logging.INFO):
+    """To set up as many loggers as you want"""
+    handler = logging.FileHandler(log_file)
+    handler.setFormatter(formatter)
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    if logger.handlers:
+        logger.handlers = []
+    logger.addHandler(handler)
 
-    # Shuffling the data is specified TRUE
+    return logger
 
-    if shuffle_data == True:
-        train_df = pd.concat([X , y] , axis=1)
-        train_df = shuffle(train_df)
-        train_df = train_df.reset_index()
-        train_df.drop(columns='index',inplace=True)
-        X_train = train_df.drop(columns = 'LABEL')
-        y_train = train_df['LABEL']
-
-    # Spliting the data in train test split
-
-    X_train = X[:-test_len] 
-    y_train = y[:-test_len]
-    
-    X_test = X[-test_len:]
-    y_test = y[-test_len:]
-    
-
-    return X_train ,y_train , X_test , y_test  , lables
+# ---------------------------------------------------------------------------------------------
+# =============================================================================================
+# ---------------------------------------------------------------------------------------------
