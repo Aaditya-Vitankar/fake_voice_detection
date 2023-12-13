@@ -22,7 +22,7 @@ var/
 wheels/
 share/python-wheels/
 *.egg-info/
-/mnt/5866F9FE66F9DCA6/Puneet CDAC-Practice/CDAC_Project/Project/DATA/
+./DATA
 .installed.cfg
 *.egg
 MANIFEST
