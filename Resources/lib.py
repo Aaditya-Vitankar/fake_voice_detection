@@ -1,14 +1,13 @@
-# ---------------------------------------------------------------------------------------------
-# Imports
-# ---------------------------------------------------------------------------------------------
+###-----------------
+### Import Libraries
+###-----------------
 
 import os
 import logging
-import librosa
+
+
 import numpy as np
 import pandas as pd
-from tqdm.notebook import tqdm
-
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -32,34 +31,11 @@ from sklearn.utils import shuffle
 # %matplotlib inline
 
 # for Frature Extraction
-
-
-# ---------------------------------------------------------------------------------------------
-# =============================================================================================
-# ---------------------------------------------------------------------------------------------
-
-### Some parameters
-
-inpDir = '../../DATA/KAGGLE'
-outDir = '../../DATA'
-subDir = 'csvs'
-audDir = "AUDIO"
-
-RANDOM_STATE = 24               # REMEMBER: to remove at the time of promotion to production
-np.random.seed(RANDOM_STATE)    # Set Random Seed for reproducible  results
-
-# parameters for Matplotlib
-params = {'legend.fontsize': 'x-large',
-          'figure.figsize': (15, 8),
-          'axes.labelsize': 'x-large',
-          'axes.titlesize':'x-large',
-          'xtick.labelsize':'x-large',
-          'ytick.labelsize':'x-large'
-         }
-
-CMAP = 'coolwarm' # plt.cm.Spectral
-
-plt.rcParams.update(params)
+import os
+import librosa
+import numpy as np
+import pandas as pd
+from tqdm.notebook import tqdm
 
 
 # ---------------------------------------------------------------------------------------------
@@ -120,47 +96,6 @@ def extract_features(file_path, segment_length):   # Function to extract feature
         print(f"Error processing {file_path}: {e}")
         return None
 
-# ---------------------------------------------------------------------------------------------
-# =============================================================================================
-# ---------------------------------------------------------------------------------------------
-
-'''Creates the seprate dataset for each of the audio file
-   with the dir name as a suffix as label
-   audio_dir = str : directory in with the file in
-   segment_length : inervel for taking samples
-   csv_output_path : path in whic you want ot store the csvs
-'''
-
-
-# Function to create the dataset
-def create_dataset_sep(audio_dir, segment_length , csv_output_path):
-    
-    labels = os.listdir(audio_dir) # Label for y
-    feature_list = []
-
-    # Iterate over all files in the audio_dir
-    for label in labels:
-        print(f'Processing {label} files...')
-        files = os.listdir(os.path.join(audio_dir, label))
-        # Wrap the files iterable with tqdm to show the progress bar
-        for file in files:
-            file_path = os.path.join(audio_dir, label, file)
-            # Extract features for the current file
-            file_features = extract_features(file_path, segment_length)
-            if file_features:
-                # Append features of all segments along with the label to the dataset
-                for segment_features in file_features:
-                    feature_list.append(segment_features + [label])
-                    
-            # Create a DataFrame with the dataset
-            df = pd.DataFrame(feature_list, columns=['chroma_stft', 'rms', 'spectral_centroid', 'spectral_bandwidth', 'rolloff', 'zero_crossing_rate', 'mfcc1', 'mfcc2', 'mfcc3', 'mfcc4', 'mfcc5', 'mfcc6', 'mfcc7', 'mfcc8', 'mfcc9', 'mfcc10', 'mfcc11', 'mfcc12', 'mfcc13', 'mfcc14', 'mfcc15', 'mfcc16', 'mfcc17', 'mfcc18', 'mfcc19', 'mfcc20','LABEL'])
-            fn_name = file.rstrip('.wav')
-            csv_output_path = f'{csv_output_path}/{fn_name}_{label}.csv'
-            df.to_csv(csv_output_path, index=False)
-
-            print(f'Dataset created and saved to {csv_output_path}')
-    
-    return None
 
 # Function to create the dataset
 
@@ -169,12 +104,6 @@ def create_dataset_sep(audio_dir, segment_length , csv_output_path):
    audio_dir = str : directory in with the file in
    segment_length : inervel for taking samples
 '''
-
-# ---------------------------------------------------------------------------------------------
-# =============================================================================================
-# ---------------------------------------------------------------------------------------------
-
-
 
 def create_dataset(audio_dir, segment_length):
     
@@ -201,6 +130,7 @@ def create_dataset(audio_dir, segment_length):
     return df
 
 
+
 # ---------------------------------------------------------------------------------------------
 # =============================================================================================
 # ---------------------------------------------------------------------------------------------
@@ -222,7 +152,11 @@ def check_GPU():
 # ---------------------------------------------------------------------------------------------
 
 
-# Extract Features From Audio
+# Function to create the DataFrame
+
+'''Extracts Fetures from Audio and  returns DataFrame (Features Only)
+        File_path : Audio File Path
+        Segment_length : Length of Segment you want to extract fetures'''
 
 def create_DataFrame(File_path, segment_length):
     feature_list =[]
@@ -240,7 +174,50 @@ def create_DataFrame(File_path, segment_length):
 # =============================================================================================
 # ---------------------------------------------------------------------------------------------
 
+
+# Function to create the dataset
+
+'''Creates the seprate dataset for each of the audio file
+   with the dir name as a suffix as label
+   audio_dir = str : directory in with the file in
+   segment_length : inervel for taking samples
+   csv_output_path : path in whic you want ot store the csvs
+'''
+
+def create_dataset_sep(audio_dir, segment_length , csv_output_path):
+    
+    labels = os.listdir(audio_dir) # Label for y
+    
+
+    # Iterate over all files in the audio_dir
+    for label in labels:
+        print(f'Processing {label} files...')
+        files = os.listdir(os.path.join(audio_dir, label))
+        # Wrap the files iterable with tqdm to show the progress bar
+        for file in files:
+            file_path = os.path.join(audio_dir, label, file)
+
+            df = create_DataFrame(file_path, segment_length)
+
+            df['LABEL'] = [label for _ in range(len(df))]
+            fn_name = file.rstrip('.wav')
+            
+            df.to_csv(file_path, index=False)
+
+            print(f'Dataset created and saved to {file_path}')
+    
+    return None
+
+
+# ---------------------------------------------------------------------------------------------
+# =============================================================================================
+# ---------------------------------------------------------------------------------------------
+
+
 # Logger
+
+'''Use to Keep Logs'''
+
 formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
 def setup_logger(name, log_file, level=logging.INFO):
     """To set up as many loggers as you want"""
@@ -257,3 +234,38 @@ def setup_logger(name, log_file, level=logging.INFO):
 # ---------------------------------------------------------------------------------------------
 # =============================================================================================
 # ---------------------------------------------------------------------------------------------
+
+'''use to Simulate AI Model when AI model is not Avilable (ONLY FOR DEVLOPMENT PERPOSE)'''
+
+def Dummy_predict(data = np.array):
+    if data.shape[2] == 26:
+        return np.random.choice(['REAL','FAKE'])
+    else:
+        return 'FAKE'
+
+# ---------------------------------------------------------------------------------------------
+# =============================================================================================
+# ---------------------------------------------------------------------------------------------
+    
+def reshape_data(data = pd.DataFrame ,label = 'NONE', time_step = 30 , time_interval = 10):
+
+    rem = len(data)% time_step
+    if rem!=0:
+        data = data.iloc[:-rem]
+    x_dim = data.shape[1]
+    y_dim = 1
+    z_dim = time_step
+    new_data = data.iloc[:time_step].to_numpy().reshape(y_dim,z_dim,x_dim)
+
+    for i in range(time_step,len(data)-time_step , time_interval):
+        part = data.iloc[i:i+time_step]
+        part = part.to_numpy().reshape(y_dim,z_dim,x_dim)
+        new_data = np.concatenate((new_data, part),axis=0)
+    
+    if label != 'NONE':
+        y_re = [label for _ in range(len(new_data))]
+        len(y_re)
+
+        return new_data , y_re
+    else:
+        return new_data

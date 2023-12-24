@@ -1,7 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for , session
 import os
+# from Resources.lib import *
+# from Resources import lib as lib
+from main import *
+import main as m
 
 app = Flask(__name__)
+app.secret_key = 'Puneet'
 UPLOAD_FOLDER = "upload"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -22,14 +27,17 @@ def upload_file():
     try:
         filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filename)
+
+        session['File_Name'] = filename
         return 'File uploaded successfully.'
     except Exception as e:
         return f'Error: {str(e)}'
 
 @app.route('/result', methods=['POST' , 'GET'])
 def result():
-    data = {}
-    data['result'] = "POSITIVE"
+    file = session.get('File_Name' , None)
+    print(file)
+    data = m.main(file)
     return render_template('result.html',data=data)
 
 if __name__ == '__main__':
