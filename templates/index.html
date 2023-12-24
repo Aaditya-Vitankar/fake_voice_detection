@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column; /* Set flex direction to column */
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #header {
+            text-align: center;
+            background-color: #3498db;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        #table-container {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin-right: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #3498db;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        #drop-area {
+            border: 2px dashed #3498db;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background-color: #e4ecee;
+            width: 300px;
+        }
+
+        #file-info {
+            margin-bottom: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        label[for="file-input"] {
+            display: block;
+            background-color: #3498db;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        label[for="file-input"]:hover {
+            background-color: #2980b9;
+        }
+
+        #process-button {
+            padding: 10px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #process-button:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">Deep Fake Detector</div>
+
+    <div id="table-container">
+        <table>
+            <tr>
+                <th>PRN</th>
+                <th>NAME</th>
+            </tr>
+            <tr>
+                <td>230940128001</td>
+                <td>Aaditya Vitankar</td>
+            </tr>
+            <tr>
+                <td>230940128009</td>
+                <td>Chinmay Joshi</td>
+            </tr>
+            <tr>
+                <td>230940128023</td>
+                <td>Puneet Sharma</td>
+            </tr>
+            <tr>
+                <td>230940128027</td>
+                <td>Sahil Diwan</td>
+            </tr>
+            <tr>
+                <td>230940128028</td>
+                <td>Shubham Singh</td>
+            </tr>
+            
+            <!-- Add more rows as needed -->
+        </table>
+    </div>
+    
+    <div id="drop-area" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+        <p id="file-info">Drag and drop a file here or click to select a file</p>
+        <input type="file" id="file-input" style="display: none;" onchange="handleFile(this.files)">
+        <button id="process-button" onclick="processFiles()">Process</button>
+    </div>
+
+    <script>
+        function dropHandler(event) {
+            event.preventDefault();
+            var files = event.dataTransfer.files;
+            handleFiles(files);
+        }
+
+        function dragOverHandler(event) {
+            event.preventDefault();
+        }
+
+        function handleFile(files) {
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            for (var i = 0; i < files.length; i++) {
+                // displayFileName(files[i].name);
+                uploadFile(files[i]);
+            }
+        }
+
+        function displayFileName(fileName) {
+            var fileInfo = document.getElementById('file-info');
+            fileInfo.textContent = fileName;
+        }
+
+        function processFiles() {
+            window.location.href = '/result'; // Redirect to the /process route
+        }
+
+        function uploadFile(file) {
+            var formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(message => {
+                if (message.startsWith('Error')) {
+                    alert(message);
+                } else {
+                    console.log(message);
+                    displayFileName(file.name);  // Update the file name only on successful upload
+                    // You can choose to perform additional actions on successful upload
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
