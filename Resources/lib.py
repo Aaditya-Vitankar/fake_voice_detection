@@ -202,9 +202,9 @@ def create_dataset_sep(audio_dir, segment_length , csv_output_path):
             df['LABEL'] = [label for _ in range(len(df))]
             fn_name = file.rstrip('.wav')
             
-            df.to_csv(file_path, index=False)
+            df.to_csv(csv_output_path+fn_name+".csv", index=False)
 
-            print(f'Dataset created and saved to {file_path}')
+            print(f'Dataset created and saved to {csv_output_path+fn_name+".csv"}')
     
     return None
 
