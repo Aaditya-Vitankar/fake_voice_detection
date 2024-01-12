@@ -1,41 +1,78 @@
+# ---------------------------------------------------------------------------------------------
+# =============================================================================================
+# ---------------------------------------------------------------------------------------------
+
+# Logger
+
+'''Use to Keep Logs'''
+import logging
+formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
+def setup_logger(name, log_file, level=logging.INFO):
+    """To set up as many loggers as you want"""
+    handler = logging.FileHandler(log_file)
+    handler.setFormatter(formatter)
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    if logger.handlers:
+        logger.handlers = []
+    logger.addHandler(handler)
+
+    return logger
+
+
+# ---------------------------------------------------------------------------------------------
+# =============================================================================================
+# ---------------------------------------------------------------------------------------------
+
+lg_info = setup_logger("LIB","./logs/lib.log" , level=logging.INFO)
+
+lg_err = setup_logger("LIB","./logs/lib.log" , level=logging.ERROR)
+
+lg_war = setup_logger("LIB","./logs/lib.log" , level=logging.WARNING)
+
+
 ###-----------------
 ### Import Libraries
 ###-----------------
+lg_info.info("INFO:  Import STARTED")
+try:
+    import os
 
-import os
-import logging
 
+    import numpy as np
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import seaborn as sns
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+    from collections.abc import Callable
+    from typing import Literal
 
-from collections.abc import Callable
-from typing import Literal
+    from sklearn import datasets
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, ConfusionMatrixDisplay
+    from sklearn.preprocessing import StandardScaler
 
-from sklearn import datasets
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, ConfusionMatrixDisplay
-from sklearn.preprocessing import StandardScaler
+    import tensorflow as tf
 
-import tensorflow as tf
+    from sklearn.utils import shuffle
 
-from sklearn.utils import shuffle
+    # import torch
+    # import torch.nn as nn
+    # import torch.nn.functional as F
+    # from torch.autograd import Variable
 
-# import torch
-# import torch.nn as nn
-# import torch.nn.functional as F
-# from torch.autograd import Variable
+    # %matplotlib inline
 
-# %matplotlib inline
+    # for Frature Extraction
+    import os
+    import librosa
+    import numpy as np
+    import pandas as pd
+    from tqdm.notebook import tqdm
+    lg_info.info("INFO: Import SUCCESSFUL")
+except Exception as e:
+    lg_err.error(f"ERROR: Import FAILED: {e}")
 
-# for Frature Extraction
-import os
-import librosa
-import numpy as np
-import pandas as pd
-from tqdm.notebook import tqdm
 
 
 # ---------------------------------------------------------------------------------------------
@@ -48,7 +85,7 @@ from tqdm.notebook import tqdm
         segment_length : inverl for taking samples
 '''
 def extract_features(file_path, segment_length):   # Function to extract features from an audio file
-    
+    lg_info.info("INFO: Feature Extraction STARTED")
     try:
         
         y, sr = librosa.load(file_path) 
@@ -89,10 +126,11 @@ def extract_features(file_path, segment_length):   # Function to extract feature
             
             # Append the extracted features to the list
             features.append([chroma_stft, rms, spec_cent, spec_bw, rolloff, zcr, *mfccs_mean])
-
+        lg_info.info("INFO: Feature Extraction SUCCESSFUL")
         return features
     
     except Exception as e:
+        lg_err.error(f"ERROR: Feature Extraction FAILED: {e}")
         print(f"Error processing {file_path}: {e}")
         return None
 
@@ -107,27 +145,31 @@ def extract_features(file_path, segment_length):   # Function to extract feature
 
 def create_dataset(audio_dir, segment_length):
     
-    labels = os.listdir(audio_dir) # Label for y
-    feature_list = []
+    try:
+        labels = os.listdir(audio_dir) # Label for y
+        feature_list = []
 
-    # Iterate over all files in the audio_dir
-    for label in labels:
-        print(f'Processing {label} files...')
-        files = os.listdir(os.path.join(audio_dir, label))
-        # Wrap the files iterable with tqdm to show the progress bar
-        for file in files:
-            file_path = os.path.join(audio_dir, label, file)
-            # Extract features for the current file
-            file_features = extract_features(file_path, segment_length)
-            if file_features:
-                # Append features of all segments along with the label to the dataset
-                for segment_features in file_features:
-                    feature_list.append(segment_features + [label])
-                    
-    # Create a DataFrame with the dataset
-    df = pd.DataFrame(feature_list, columns=['chroma_stft', 'rms', 'spectral_centroid', 'spectral_bandwidth', 'rolloff', 'zero_crossing_rate', 'mfcc1', 'mfcc2', 'mfcc3', 'mfcc4', 'mfcc5', 'mfcc6', 'mfcc7', 'mfcc8', 'mfcc9', 'mfcc10', 'mfcc11', 'mfcc12', 'mfcc13', 'mfcc14', 'mfcc15', 'mfcc16', 'mfcc17', 'mfcc18', 'mfcc19', 'mfcc20','LABEL'])
-    
-    return df
+        # Iterate over all files in the audio_dir
+        for label in labels:
+            print(f'Processing {label} files...')
+            files = os.listdir(os.path.join(audio_dir, label))
+            # Wrap the files iterable with tqdm to show the progress bar
+            for file in files:
+                file_path = os.path.join(audio_dir, label, file)
+                # Extract features for the current file
+                file_features = extract_features(file_path, segment_length)
+                if file_features:
+                    # Append features of all segments along with the label to the dataset
+                    for segment_features in file_features:
+                        feature_list.append(segment_features + [label])
+                        
+        # Create a DataFrame with the dataset
+        df = pd.DataFrame(feature_list, columns=['chroma_stft', 'rms', 'spectral_centroid', 'spectral_bandwidth', 'rolloff', 'zero_crossing_rate', 'mfcc1', 'mfcc2', 'mfcc3', 'mfcc4', 'mfcc5', 'mfcc6', 'mfcc7', 'mfcc8', 'mfcc9', 'mfcc10', 'mfcc11', 'mfcc12', 'mfcc13', 'mfcc14', 'mfcc15', 'mfcc16', 'mfcc17', 'mfcc18', 'mfcc19', 'mfcc20','LABEL'])
+        
+        lg_info.info("INFO: Dataset creation SUCCESSFUL")
+        return df
+    except Exception as e:
+        lg_err.error(f"INFO: Dataset creation FAILED: {e}")
 
 
 
@@ -144,7 +186,9 @@ def check_GPU():
             tf.config.experimental.set_memory_growth(g, True)
         logical_gpus = tf.config.list_logical_devices('GPU')
         print (len(gpus), 'Phusical GPUs', len(logical_gpus), 'Logical GPUs')
+        lg_info.info("INFO: GPU Configration SUCCESSFUL")
     except:
+        lg_err.error("INFO: GPU Configration FAILED")
         print ('invalid device')
 
 # ---------------------------------------------------------------------------------------------
@@ -159,16 +203,21 @@ def check_GPU():
         Segment_length : Length of Segment you want to extract fetures'''
 
 def create_DataFrame(File_path, segment_length):
-    feature_list =[]
-    file_features = extract_features(File_path, segment_length)
-    if file_features:
-        # Append features of all segments along with the label to the dataset
-        for segment_features in file_features:
-            feature_list.append(segment_features)
-                    
-    # Create a DataFrame with the dataset
-    df = pd.DataFrame(feature_list, columns=['chroma_stft', 'rms', 'spectral_centroid', 'spectral_bandwidth', 'rolloff', 'zero_crossing_rate', 'mfcc1', 'mfcc2', 'mfcc3', 'mfcc4', 'mfcc5', 'mfcc6', 'mfcc7', 'mfcc8', 'mfcc9', 'mfcc10', 'mfcc11', 'mfcc12', 'mfcc13', 'mfcc14', 'mfcc15', 'mfcc16', 'mfcc17', 'mfcc18', 'mfcc19', 'mfcc20'])
-    return df
+    
+    try:
+        feature_list =[]
+        file_features = extract_features(File_path, segment_length)
+        if file_features:
+            # Append features of all segments along with the label to the dataset
+            for segment_features in file_features:
+                feature_list.append(segment_features)
+                        
+        # Create a DataFrame with the dataset
+        df = pd.DataFrame(feature_list, columns=['chroma_stft', 'rms', 'spectral_centroid', 'spectral_bandwidth', 'rolloff', 'zero_crossing_rate', 'mfcc1', 'mfcc2', 'mfcc3', 'mfcc4', 'mfcc5', 'mfcc6', 'mfcc7', 'mfcc8', 'mfcc9', 'mfcc10', 'mfcc11', 'mfcc12', 'mfcc13', 'mfcc14', 'mfcc15', 'mfcc16', 'mfcc17', 'mfcc18', 'mfcc19', 'mfcc20'])
+        lg_info.info("INFO: DataFrame creation SUCCESSFUL")
+        return df
+    except Exception as e:
+        lg_err.error(f"INFO: DataFrame creation FAILED: {e}")
 
 # ---------------------------------------------------------------------------------------------
 # =============================================================================================
@@ -185,51 +234,34 @@ def create_DataFrame(File_path, segment_length):
 '''
 
 def create_dataset_sep(audio_dir, segment_length , csv_output_path):
-    
-    labels = os.listdir(audio_dir) # Label for y
-    
+    try:
+        lg_info.info("INFO: DataFrame creation STARED")
+        
+        labels = os.listdir(audio_dir) # Label for y
+        
 
-    # Iterate over all files in the audio_dir
-    for label in labels:
-        print(f'Processing {label} files...')
-        files = os.listdir(os.path.join(audio_dir, label))
-        # Wrap the files iterable with tqdm to show the progress bar
-        for file in files:
-            file_path = os.path.join(audio_dir, label, file)
+        # Iterate over all files in the audio_dir
+        for label in labels:
+            print(f'Processing {label} files...')
+            files = os.listdir(os.path.join(audio_dir, label))
+            # Wrap the files iterable with tqdm to show the progress bar
+            for file in files:
+                file_path = os.path.join(audio_dir, label, file)
 
-            df = create_DataFrame(file_path, segment_length)
+                df = create_DataFrame(file_path, segment_length)
 
-            df['LABEL'] = [label for _ in range(len(df))]
-            fn_name = file.rstrip('.wav')
-            
-            df.to_csv(csv_output_path+fn_name+".csv", index=False)
+                df['LABEL'] = [label for _ in range(len(df))]
+                fn_name = file.rstrip('.wav')
+                
+                df.to_csv(csv_output_path+fn_name+".csv", index=False)
 
-            print(f'Dataset created and saved to {csv_output_path+fn_name+".csv"}')
-    
-    return None
-
-
-# ---------------------------------------------------------------------------------------------
-# =============================================================================================
-# ---------------------------------------------------------------------------------------------
-
-
-# Logger
-
-'''Use to Keep Logs'''
-
-formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
-def setup_logger(name, log_file, level=logging.INFO):
-    """To set up as many loggers as you want"""
-    handler = logging.FileHandler(log_file)
-    handler.setFormatter(formatter)
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
-    if logger.handlers:
-        logger.handlers = []
-    logger.addHandler(handler)
-
-    return logger
+                print(f'Dataset created and saved to {csv_output_path+fn_name+".csv"}')
+                lg_info.info(f"INFO: Dataset created and saved to {csv_output_path+fn_name}.csv")
+        
+        lg_info.info("INFO: DataFrame creation SUCCESSFUL")
+        return None
+    except Exception as e:
+        lg_err.error(f"INFO: DataFrame creation FAILED: {e}")
 
 # ---------------------------------------------------------------------------------------------
 # =============================================================================================
@@ -249,23 +281,30 @@ def Dummy_predict(data = np.array):
     
 def reshape_data(data = pd.DataFrame ,label = 'NONE', time_step = 30 , time_interval = 10):
 
-    rem = len(data)% time_step
-    if rem!=0:
-        data = data.iloc[:-rem]
-    x_dim = data.shape[1]
-    y_dim = 1
-    z_dim = time_step
-    new_data = data.iloc[:time_step].to_numpy().reshape(y_dim,z_dim,x_dim)
+    try:
+        rem = len(data)% time_step
+        if rem!=0:
+            data = data.iloc[:-rem]
+        x_dim = data.shape[1]
+        y_dim = 1
+        z_dim = time_step
+        new_data = data.iloc[:time_step].to_numpy().reshape(y_dim,z_dim,x_dim)
 
-    for i in range(time_step,len(data)-time_step , time_interval):
-        part = data.iloc[i:i+time_step]
-        part = part.to_numpy().reshape(y_dim,z_dim,x_dim)
-        new_data = np.concatenate((new_data, part),axis=0)
+        for i in range(time_step,len(data)-time_step , time_interval):
+            part = data.iloc[i:i+time_step]
+            part = part.to_numpy().reshape(y_dim,z_dim,x_dim)
+            new_data = np.concatenate((new_data, part),axis=0)
+        
+        if label != 'NONE':
+            y_re = [label for _ in range(len(new_data))]
+            len(y_re)
+
+            lg_info.info("INFO: Data Reshape with lables SUCCESSFUL")
+            return new_data , y_re
+        else:
+            lg_info.info("INFO: Data Reshaping SUCCESSFUL")
+            return new_data
     
-    if label != 'NONE':
-        y_re = [label for _ in range(len(new_data))]
-        len(y_re)
-
-        return new_data , y_re
-    else:
-        return new_data
+    except Exception as e:
+        lg_err.error(f"ERROR: Data Reshaping FAILED: {e}")
+        

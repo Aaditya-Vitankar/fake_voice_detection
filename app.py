@@ -1,14 +1,21 @@
 from flask import Flask, render_template, request, redirect, url_for , session
 import os
-# from Resources.lib import *
-# from Resources import lib as lib
+from Resources.lib import *
+from Resources import lib as lib
 from main import *
 import main as m
 
 app = Flask(__name__)
 app.secret_key = 'Puneet'
-UPLOAD_FOLDER = "upload"
+UPLOAD_FOLDER = "Upload"
+LOGS = "logs"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+lg_info = lib.setup_logger("WEB_APP","./logs/main.log" , level=lib.logging.INFO)
+
+lg_err = lib.setup_logger("WEB_APP","./logs/main.log" , level=lib.logging.ERROR)
+
+lg_war = lib.setup_logger("WEB_APP","./logs/main.log" , level=lib.logging.WARNING)
 
 @app.route('/')
 def index():
@@ -17,30 +24,40 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
+        lg_err.error('ERROR: No file part')
         return 'Error: No file part'
 
     file = request.files['file']
 
     if file.filename == '':
+        lg_war.warning('WARNING: No Selected file')
         return 'Error: No selected file'
 
     try:
         filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filename)
-
+        lg_info.info("INFO: File Uploaded SUCCESSFULLY")
         session['File_Name'] = filename
-        return 'File uploaded successfully.'
+        return 'File uploaded SUCCESSFULLY.'
     except Exception as e:
+        lg_err.error(f'ERROR: File uploaded FAILED{e}')
         return f'Error: {str(e)}'
 
 @app.route('/result', methods=['POST' , 'GET'])
 def result():
     file = session.get('File_Name' , None)
     print(file)
+    lg_info.info(f"INFO: Classification STARTED of File : {file}")
     data = m.main(file)
+    lg_info.info(f"INFO: Classification DONE of File : {file}")
     return render_template('result.html',data=data)
 
 if __name__ == '__main__':
-    if not os.path.exists(UPLOAD_FOLDER):
+    if not os.path.exists(LOGS):
+        os.makedirs(LOGS)
+        lg_info.info(f"INFO: {LOGS} Created SUCCESSFULLY")
+    elif not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
-    app.run(debug=True)
+        lg_info.info(f"INFO: {UPLOAD_FOLDER} Created SUCCESSFULLY")
+    lg_info.info(f"INFO: APP STARTED SUCCESSFULLY")
+    app.run(debug=True , port = 80 , host='0.0.0.0')
