@@ -28,8 +28,12 @@ def setup_logger(name, log_file, level=logging.WARNING):
 # ---------------------------------------------------------------------------------------------
 # =============================================================================================
 # ---------------------------------------------------------------------------------------------
+import os
 
 log_file = "./logs/main.log"
+
+if not os.path.exists(log_file):
+    os.mkdir(log_file)
 
 lg_info = setup_logger("LIB",log_file , level=int(4))
 
@@ -41,9 +45,6 @@ lg_war = setup_logger("LIN",log_file , level=logging.WARNING)
 ###-----------------
 ### Import Libraries
 ###-----------------
-
-import os
-
 
 import numpy as np
 import pandas as pd
