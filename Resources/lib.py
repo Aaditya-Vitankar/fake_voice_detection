@@ -35,7 +35,7 @@ log_file = "./logs/main.log"
 if not os.path.exists(log_file):
     os.makedirs(log_file)
 
-lg_info = setup_logger("LIB",log_file , level=int(4))
+lg_info = setup_logger("LIB",log_file , level=logging.INFO)
 
 lg_err = setup_logger("LIB",log_file, level=logging.ERROR)
 
