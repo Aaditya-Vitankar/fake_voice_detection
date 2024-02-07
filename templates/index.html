@@ -56,6 +56,7 @@
             cursor: pointer;
             background-color: #e4ecee;
             width: 300px;
+            margin-bottom: 20px;
         }
 
         #file-info {
@@ -81,6 +82,22 @@
         label[for="file-input"]:hover {
             background-color: #2980b9;
         }
+
+        #browse-button {
+        display: block;
+        background-color: #3498db;
+        color: white;
+        padding: 8px 10px; /* Adjust padding */
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-bottom: 24px;
+        font-size: 14px; /* Adjust font size */
+    }
+
+    #browse-button:hover {
+        background-color: #2980b9;
+    }
 
         #process-button {
             padding: 10px;
@@ -120,22 +137,24 @@
             </tr>
             <tr>
                 <td>230940128027</td>
-                <td>Sahil Singh Diwan</td>
+                <td>Sahil Diwan</td>
             </tr>
             <tr>
                 <td>230940128028</td>
-                <td>Shubham Pratap Singh</td>
+                <td>Shubham Singh</td>
             </tr>
-            
-            <!-- Add more rows as needed -->
         </table>
     </div>
     
     <div id="drop-area" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
         <p id="file-info">Drag and drop a file here or click to select a file</p>
+        <!-- Browse button -->
+        <label for="file-input" id="browse-button">Browse</label>
         <input type="file" id="file-input" style="display: none;" onchange="handleFile(this.files)">
-        <button id="process-button" onclick="processFiles()">Process</button>
     </div>
+
+    <!-- Process button outside drop-area -->
+    <button id="process-button" onclick="processFiles()">Process</button>
 
     <script>
         function dropHandler(event) {
