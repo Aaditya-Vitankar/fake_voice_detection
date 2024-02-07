@@ -32,14 +32,16 @@ import os
 
 log_file = "./logs/main.log"
 
-if not os.path.exists(log_file):
-    os.makedirs(log_file)
+if not os.path.exists("./logs/"):
+    os.makedirs("./logs/")
+    with open("./logs/main.log",'w'):
+        pass
 
 lg_info = setup_logger("LIB",log_file , level=logging.INFO)
 
 lg_err = setup_logger("LIB",log_file, level=logging.ERROR)
 
-lg_war = setup_logger("LIN",log_file , level=logging.WARNING)
+lg_war = setup_logger("LIB",log_file , level=logging.WARNING)
 
 
 ###-----------------
