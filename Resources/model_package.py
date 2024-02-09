@@ -75,8 +75,14 @@ class Model:
             predict_proba = self.__model.predict(padded_data, verbose= None)
             final_proba = self.__soft_voting(predict_proba)
 
-            if final_proba[1] > 0.5:
-                return f'{final_proba[1] * 100: .2f} Real%'
-
-            else:
-                return f'{final_proba[0] * 100: .2f} Fake%'
+            if 1.00 > final_proba[1] > 0.8:
+                return f'Audio is Real'
+            
+            elif 0.8 > final_proba[1] > 0.5:
+                return f'Audio Seems Real with {final_proba[1] * 100: .2f}% Probability'
+            
+            elif 0.5 > final_proba[1] > 0.2:
+                return f'Audio Seems Fake with {final_proba[0] * 100: .2f}% Probability'
+            
+            elif 0.2 > final_proba[1] > 0:
+                return 'Audio is Fake'

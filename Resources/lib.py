@@ -82,7 +82,8 @@ import os
 import librosa
 import numpy as np
 import pandas as pd
-from tqdm.notebook import tqdm
+from pydub import AudioSegment
+
 
 # ---------------------------------------------------------------------------------------------
 # =============================================================================================
@@ -231,6 +232,20 @@ def create_DataFrame(File_path, segment_length):
 # ---------------------------------------------------------------------------------------------
 # =============================================================================================
 # ---------------------------------------------------------------------------------------------
+
+
+def convert_mp3_to_wav(mp3_file, wav_file):
+    try:
+        # Load the MP3 file
+        audio = AudioSegment.from_mp3(mp3_file)
+        
+        # Export the audio to WAV
+        audio.export(wav_file, format="wav")
+        
+        print(f"MP3 file '{mp3_file}' converted to WAV file '{wav_file}' successfully.")
+    except Exception as e:
+        print(f"Error converting MP3 to WAV: {e}")
+
 
 
 # Function to create the dataset

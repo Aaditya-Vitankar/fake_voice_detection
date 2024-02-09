@@ -17,7 +17,16 @@ def main(file):
     
     try:
         lg_info.info("Features extraction CALLED")
-        data = create_DataFrame(file , segment_length=1)
+
+        if file[-4:] == ".mp3":
+            mp3_file = file[:-4] + ".wav"
+            convert_mp3_to_wav(file , mp3_file)
+        elif file[-4:] == ".wav":
+            mp3_file = file
+            pass
+
+
+        data = create_DataFrame(mp3_file , segment_length=1)
     except:
          lg_err.error(f"Features extraction FAILED: {e}")
 

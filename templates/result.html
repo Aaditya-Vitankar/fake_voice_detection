@@ -24,6 +24,7 @@
 
         button {
             padding: 10px 20px;
+            margin-bottom: 20px;
             background-color: #3498db;
             color: white;
             border: rgb(0, 0, 0);
@@ -55,16 +56,28 @@
             animation: fadeIn 1s ease-out forwards, borderAnimation 1s ease-out forwards; /* Animation settings */
         }
 
-        h2.positive {
+        h2.real {
             background-color: #2ecc71;
             color: white;
             border: 2px solid #27ae60;
         }
 
-        h2.negative {
+        h2.fake {
             background-color: #e74c3c;
             color: white;
             border: 2px solid #c0392b;
+        }
+
+        h2.not_sure {
+            background-color: #fff822;
+            color: rgb(54, 54, 54);
+            border: 2px solid rgba(224, 217, 15, 0.921);
+        }
+
+        h2.nothing_found {
+            background-color: #25e6ff;
+            color: rgb(255, 255, 255);
+            border: 2px solid #1ba8bb;
         }
 
         @keyframes fadeIn {
@@ -89,10 +102,21 @@
 <body>
     <a href="/"><button>Home</button></a>
     <!-- <h5>{{data}}</h5> -->
-    {% if "Fake" in data %}
-        <h2 class="negative">The Audio is {{data}}</h2>
+    {% if "Audio is Real" == data %}
+        <h2 class="real">{{data}}</h2>
+
+    {% elif "Audio is Fake" == data %}
+
+        <h2 class="fake">{{data}}</h2>
+    {% elif "Audio Seems Real with" in data %}
+        <h2 class="not_sure">{{data}}</h2>
+
+    {% elif "Audio Seems Fake with" in data %}
+        <h2 class="not_sure">{{data}}</h2>
+
     {% else %}
-        <h2 class="positive">The Audio is {{data}}</h2>
+    <h2 class="nothing_found">Found Nothing</h2>
+        
     {% endif %}
 </body>
 </html>

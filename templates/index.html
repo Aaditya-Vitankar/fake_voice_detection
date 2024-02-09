@@ -95,7 +95,7 @@
 
         #file-info {
             margin-bottom: 20px;
-            color: #7f8c8d;
+            color: #3b4040;
             font-size: 14px;
         }
 
@@ -232,6 +232,7 @@
         
 
         function uploadFile(file) {
+            displayFileName('File Uploading...')
             var formData = new FormData();
             formData.append('file', file);
 
