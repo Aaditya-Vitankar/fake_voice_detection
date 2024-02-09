@@ -88,11 +88,11 @@
 </head>
 <body>
     <a href="/"><button>Home</button></a>
-    <h5>{{data["message"]}}</h5>
-    {% if data["result"] == 'REAL' %}
-        <h2 class="positive">The Audio is Real</h2>
+    <!-- <h5>{{data}}</h5> -->
+    {% if "Fake" in data %}
+        <h2 class="negative">The Audio is {{data}}</h2>
     {% else %}
-        <h2 class="negative">The Audio is Fake</h2>
+        <h2 class="positive">The Audio is {{data}}</h2>
     {% endif %}
 </body>
 </html>

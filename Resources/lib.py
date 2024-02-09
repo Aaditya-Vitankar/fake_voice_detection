@@ -61,7 +61,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, ConfusionMatrixDisplay
 from sklearn.preprocessing import StandardScaler
 
+import warnings
+warnings.filterwarnings('ignore')
+import math
 import tensorflow as tf
+
+from Resources import model_package as MODEL
 
 from sklearn.utils import shuffle
 
@@ -278,6 +283,13 @@ def Dummy_predict(data = np.array):
         return np.random.choice(['REAL','FAKE'])
     else:
         return 'FAKE'
+    
+def TF_Predict(data = pd.DataFrame):
+    model = MODEL.Model()
+    model.buid_model()
+    model.load_weights("Weights/demo_weigths")
+    result = model.predict(data)
+    return result
 
 # ---------------------------------------------------------------------------------------------
 # =============================================================================================

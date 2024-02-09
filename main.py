@@ -21,15 +21,16 @@ def main(file):
     except:
          lg_err.error(f"Features extraction FAILED: {e}")
 
-    try:
-        lg_info.info("Data reshape CALLED")
-        reshaped_data = reshape_data(data)
-    except Exception as e:
-        lg_err.error(f"Data reshape FAILED: {e}")
+    # try:
+    #     lg_info.info("Data reshape CALLED")
+    #     reshaped_data = reshape_data(data)
+    # except Exception as e:
+    #     lg_err.error(f"Data reshape FAILED: {e}")
 
     try:
         lg_info.info("Classification STARTED")
-        result = Dummy_predict(reshaped_data)
+        result = lib.TF_Predict(data)
+        # result = Dummy_predict(reshaped_data)
         lg_info.info("Classification SUCCESSFUL")
         lg_info_main.info("Classification SUCCESSFUL")
         lg_info_main.info("*-"*70)
