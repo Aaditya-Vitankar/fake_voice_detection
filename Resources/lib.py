@@ -61,7 +61,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, ConfusionMatrixDisplay
 from sklearn.preprocessing import StandardScaler
 
-# import tensorflow as tf
+import tensorflow as tf
 
 from sklearn.utils import shuffle
 
