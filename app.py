@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for , session
+from flask import Flask, render_template, request, session
 import os
 from Resources.lib import *
 from Resources import lib as lib
@@ -27,6 +27,8 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    with open('logs/upload_flag.txt', 'w') as fp:
+        pass
     if 'file' not in request.files:
         lg_err.error('ERROR: No file part')
         return 'Error: No file part'
@@ -49,9 +51,14 @@ def upload_file():
 
 @app.route('/result', methods=['POST' , 'GET'])
 def result():
+    if os.path.exists('logs/upload_flag.txt') == True:
+        os.remove('logs/upload_flag.txt')
+    else:
+        return render_template('result.html',data="Please Upload a File")
     file = session.get('File_Name' , None)
-    print(file)
     lg_info.info(f"Classification STARTED of File : {file}")
+    if file == None:
+        return render_template('result.html',data="Please Upload a File")
     data = m.main(file)
     if data != "":
         lg_info.log(level=4,msg=f"Classification DONE of File : {file}")

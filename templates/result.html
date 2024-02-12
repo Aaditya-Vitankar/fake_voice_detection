@@ -80,6 +80,18 @@
             border: 2px solid #1ba8bb;
         }
 
+        h2.too_short {
+            background-color: #8325ff;
+            color: rgb(255, 255, 255);
+            border: 2px solid #5619a5;
+        }
+
+        h2.unsupported_format {
+            background-color: #2cffe3;
+            color: rgb(255, 255, 255);
+            border: 2px solid #21bda8;
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -114,8 +126,17 @@
     {% elif "Audio Seems Fake with" in data %}
         <h2 class="not_sure">{{data}}</h2>
 
+    {% elif "unsupported Format" == data %}
+        <h2 class="unsupported_format">Unsupported Please Upload either "Mp3" or "wav" file</h2>
+    
+    {% elif "File Length is Small" == data %}
+        <h2 class="too_short">File Length is Smaller than "Seven" Seconds. Please Upload Audio with length more than "Seven Seconds"</h2>
+    
+    {% elif "Please Upload a File" == data %}
+        <h2 class="nothing_found">Please Upload a File</h2>
+
     {% else %}
-    <h2 class="nothing_found">Found Nothing</h2>
+    <h2 class="nothing_found">Unexpected Exception Occured</h2>
         
     {% endif %}
 </body>

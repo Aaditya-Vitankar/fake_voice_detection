@@ -18,6 +18,12 @@ def main(file):
     try:
         lg_info.info("Features extraction CALLED")
 
+        if file[-4 :] != ".mp3" and file[-4 :] != ".wav":
+            os.remove(file)
+            lg_info.info("Unsupported File Format Found")
+            lg_info.info(f"File '{file}' deleted successfully.")
+            return "unsupported Format"
+
         if file[-4:] == ".mp3":
             mp3_file = file[:-4] + ".wav"
             convert_mp3_to_wav(file , mp3_file)
@@ -27,7 +33,14 @@ def main(file):
 
 
         data = create_DataFrame(mp3_file , segment_length=1)
-    except:
+        if len(data) < 7:
+            print(data)
+            lg_info.info("File Length Smaller than 'Seven' seconds")
+            del data
+            del mp3_file
+            del file
+            return "File Length is Small"
+    except Exception as e:
          lg_err.error(f"Features extraction FAILED: {e}")
 
     # try:
@@ -39,6 +52,9 @@ def main(file):
     try:
         lg_info.info("Classification STARTED")
         result = lib.TF_Predict(data)
+        del data
+        del mp3_file
+        del file
         # result = Dummy_predict(reshaped_data)
         lg_info.info("Classification SUCCESSFUL")
         lg_info_main.info("Classification SUCCESSFUL")
