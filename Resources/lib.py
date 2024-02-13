@@ -53,13 +53,21 @@ import pandas as pd
 
 import warnings
 warnings.filterwarnings('ignore')
-import tensorflow as tf
-from Resources import model_package as MODEL
 
-# import torch
-# import torch.nn as nn
-# import torch.nn.functional as F
-# from torch.autograd import Variable
+# TensorFlow Imports
+# import tensorflow as tf
+# from Resources.model_package import *
+# from Resources import model_package as MODEL
+
+# PyTorch Imports
+from Resources.torch_models import LSTM_Prediction_Function as model
+from Resources.torch_models.LSTM_Prediction_Function import *
+
+# from Resources.torch_models import GRU_Prediction_Function as model
+# from Resources.torch_models.GRU_Prediction_Function import *
+
+# from Resources.torch_models import RNN_Prediction_Function as model
+# from Resources.torch_models.RNN_Prediction_Function import *
 
 # %matplotlib inline
 
@@ -284,18 +292,69 @@ def Dummy_predict(data = np.array):
         return np.random.choice(['REAL','FAKE'])
     else:
         return 'FAKE'
-    
-def TF_Predict(data = pd.DataFrame):
-    model = MODEL.Model()
-    model.buid_model()
-    model.load_weights("Weights/demo_weigths")
-    result = model.predict(data)
-    return result
 
 # ---------------------------------------------------------------------------------------------
 # =============================================================================================
 # ---------------------------------------------------------------------------------------------
+
+"""def TF_Predict(data = pd.DataFrame):
+    model = MODEL.Model()
+    model.buid_model()
+    model.load_weights("Weights/demo_weigths")
+    result = model.predict(data)
+    return result"""
+
+# ---------------------------------------------------------------------------------------------
+# =============================================================================================
+# ---------------------------------------------------------------------------------------------
+
+def torch_predict_GRU(data = pd.DataFrame , weight = 1):
+    """PyTorch Prediction Funtion with GRU Model
+        data   : Pandas DataFrame : 26 Columns
+        Weight : Pretrained Weight Selection : takes integer pass in between 1 and 3 """
     
+    if weight not in [1,2,3]:
+        return "Invalid weight"
+    else:
+        weight = weight-1
+
+        wt =["./Weights/torch/GRU1/DeepfakeGRU.pt",
+            "./Weights/torch/GRU2/DeepfakeGRU.pt",
+            "./Weights/torch/GRU3/DeepfakeGRU.pt"]
+        return model.predict_label(weights=wt[weight] , input_data=data)
+
+# ---------------------------------------------------------------------------------------------
+# =============================================================================================
+# ---------------------------------------------------------------------------------------------    
+
+def torch_predict_RNN(data = pd.DataFrame, weight = 1):
+    """PyTorch Prediction Funtion with RNN Model
+        data   : Pandas DataFrame : 26 Columns
+        Weight : Pretrained Weight Selection : takes integer input as 1 or 2 """
+    
+    if weight not in [1 ,2]:
+        return "Invalid weight"
+    else:
+        weight = weight-1
+        wt = ["./Weights/torch/RNN1/DeepFakeRNN.pt",
+        "./Weights/torch/RNN2/DeepFakeRNN.pt"]
+        return model.predict_label(weights=wt[weight] , input_data=data)
+
+# ---------------------------------------------------------------------------------------------
+# =============================================================================================
+# --------------------------------------------------------------------------------------------- 
+
+def torch_predict_LSTM(data = pd.DataFrame):
+    """PyTorch Prediction Funtion with RNN Model
+        data   : Pandas DataFrame : 26 Columns"""
+    
+    wt = ["./Weights/torch/LSTM/DeepFakeLSTM.pt"]
+    return model.predict_label(weights=wt[0] , input_data=data)
+    
+# ---------------------------------------------------------------------------------------------
+# =============================================================================================
+# ---------------------------------------------------------------------------------------------
+
 def reshape_data(data = pd.DataFrame ,label = 'NONE', time_step = 30 , time_interval = 10):
 
     try:
