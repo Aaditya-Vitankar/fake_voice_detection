@@ -51,11 +51,15 @@ def main(file):
 
     try:
         lg_info.info("Classification STARTED")
-        # result = lib.TF_Predict(data)
+        
+        result = lib.TF_Predict(data)
+        
         # result = Dummy_predict(reshaped_data)
-        result = lib.torch_predict_LSTM(data) 
+        
+        # result = lib.torch_predict_LSTM(data) 
         # result = lib.torch_predict_GRU(data,weight=2)
         # result = lib.torch_predict_RNN(data,weight=2)
+        
         del data
         del mp3_file
         del file

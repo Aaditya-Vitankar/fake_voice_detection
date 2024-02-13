@@ -56,12 +56,12 @@ warnings.filterwarnings('ignore')
 
 # TensorFlow Imports
 # import tensorflow as tf
-# from Resources.model_package import *
-# from Resources import model_package as MODEL
+from Resources.model_package import *
+from Resources import model_package as MODEL
 
 # PyTorch Imports
-from Resources.torch_models import LSTM_Prediction_Function as model
-from Resources.torch_models.LSTM_Prediction_Function import *
+# from Resources.torch_models import LSTM_Prediction_Function as model
+# from Resources.torch_models.LSTM_Prediction_Function import *
 
 # from Resources.torch_models import GRU_Prediction_Function as model
 # from Resources.torch_models.GRU_Prediction_Function import *
