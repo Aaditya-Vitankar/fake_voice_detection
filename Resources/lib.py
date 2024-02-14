@@ -55,7 +55,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # TensorFlow Imports
-# import tensorflow as tf
+import tensorflow as tf
 from Resources.model_package import *
 from Resources import model_package as MODEL
 
