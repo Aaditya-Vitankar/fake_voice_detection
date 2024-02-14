@@ -55,7 +55,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # TensorFlow Imports
-import tensorflow as tf
+# import tensorflow as tf
 from Resources.model_package import *
 from Resources import model_package as MODEL
 
@@ -297,59 +297,59 @@ def Dummy_predict(data = np.array):
 # =============================================================================================
 # ---------------------------------------------------------------------------------------------
 
-"""def TF_Predict(data = pd.DataFrame):
+def TF_Predict(data = pd.DataFrame):
     model = MODEL.Model()
     model.buid_model()
     model.load_weights("Weights/demo_weigths")
     result = model.predict(data)
-    return result"""
+    return result
 
 # ---------------------------------------------------------------------------------------------
 # =============================================================================================
 # ---------------------------------------------------------------------------------------------
 
-def torch_predict_GRU(data = pd.DataFrame , weight = 1):
-    """PyTorch Prediction Funtion with GRU Model
-        data   : Pandas DataFrame : 26 Columns
-        Weight : Pretrained Weight Selection : takes integer pass in between 1 and 3 """
+# def torch_predict_GRU(data = pd.DataFrame , weight = 1):
+#     """PyTorch Prediction Funtion with GRU Model
+#         data   : Pandas DataFrame : 26 Columns
+#         Weight : Pretrained Weight Selection : takes integer pass in between 1 and 3 """
     
-    if weight not in [1,2,3]:
-        return "Invalid weight"
-    else:
-        weight = weight-1
+#     if weight not in [1,2,3]:
+#         return "Invalid weight"
+#     else:
+#         weight = weight-1
 
-        wt =["./Weights/torch/GRU1/DeepfakeGRU.pt",
-            "./Weights/torch/GRU2/DeepfakeGRU.pt",
-            "./Weights/torch/GRU3/DeepfakeGRU.pt"]
-        return model.predict_label(weights=wt[weight] , input_data=data)
+#         wt =["./Weights/torch/GRU1/DeepfakeGRU.pt",
+#             "./Weights/torch/GRU2/DeepfakeGRU.pt",
+#             "./Weights/torch/GRU3/DeepfakeGRU.pt"]
+#         return model.predict_label(weights=wt[weight] , input_data=data)
 
-# ---------------------------------------------------------------------------------------------
-# =============================================================================================
-# ---------------------------------------------------------------------------------------------    
+# # ---------------------------------------------------------------------------------------------
+# # =============================================================================================
+# # ---------------------------------------------------------------------------------------------    
 
-def torch_predict_RNN(data = pd.DataFrame, weight = 1):
-    """PyTorch Prediction Funtion with RNN Model
-        data   : Pandas DataFrame : 26 Columns
-        Weight : Pretrained Weight Selection : takes integer input as 1 or 2 """
+# def torch_predict_RNN(data = pd.DataFrame, weight = 1):
+#     """PyTorch Prediction Funtion with RNN Model
+#         data   : Pandas DataFrame : 26 Columns
+#         Weight : Pretrained Weight Selection : takes integer input as 1 or 2 """
     
-    if weight not in [1 ,2]:
-        return "Invalid weight"
-    else:
-        weight = weight-1
-        wt = ["./Weights/torch/RNN1/DeepFakeRNN.pt",
-        "./Weights/torch/RNN2/DeepFakeRNN.pt"]
-        return model.predict_label(weights=wt[weight] , input_data=data)
+#     if weight not in [1 ,2]:
+#         return "Invalid weight"
+#     else:
+#         weight = weight-1
+#         wt = ["./Weights/torch/RNN1/DeepFakeRNN.pt",
+#         "./Weights/torch/RNN2/DeepFakeRNN.pt"]
+#         return model.predict_label(weights=wt[weight] , input_data=data)
 
-# ---------------------------------------------------------------------------------------------
-# =============================================================================================
-# --------------------------------------------------------------------------------------------- 
+# # ---------------------------------------------------------------------------------------------
+# # =============================================================================================
+# # --------------------------------------------------------------------------------------------- 
 
-def torch_predict_LSTM(data = pd.DataFrame):
-    """PyTorch Prediction Funtion with RNN Model
-        data   : Pandas DataFrame : 26 Columns"""
+# def torch_predict_LSTM(data = pd.DataFrame):
+#     """PyTorch Prediction Funtion with RNN Model
+#         data   : Pandas DataFrame : 26 Columns"""
     
-    wt = ["./Weights/torch/LSTM/DeepFakeLSTM.pt"]
-    return model.predict_label(weights=wt[0] , input_data=data)
+#     wt = ["./Weights/torch/LSTM/DeepFakeLSTM.pt"]
+#     return model.predict_label(weights=wt[0] , input_data=data)
     
 # ---------------------------------------------------------------------------------------------
 # =============================================================================================
