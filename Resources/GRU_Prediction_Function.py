@@ -62,21 +62,14 @@ def predict_label(weights, input_data):
 
         probabilities = F.softmax(output,dim=1)
 
-        final_proba = probabilities.cpu().detach().numpy().tolist()[0]
+        # Extract the probability corresponding to the predicted label
+        predicted_label = torch.argmax(output).item()
+        probability_of_accuracy = probabilities[0][predicted_label].item()
 
-        if 1.00 > final_proba[0] > 0.8:
-            return f'Audio is Real'
-        
-        elif 0.8 > final_proba[0] > 0.5:
-            return f'Audio Seems Real with {final_proba[0] * 100: .2f}% Probability'
-        
-        elif 0.5 > final_proba[0] > 0.2:
-            return f'Audio Seems Fake with {final_proba[1] * 100: .2f}% Probability'
-        
-        elif 0.2 > final_proba[0] > 0:
-            return 'Audio is Fake'
-
-
+        if predicted_label == 0:
+            return f"This audio is FAKE with {probability_of_accuracy*100:.2f}% probability of accuracy"
+        else:
+            return f"This audio is REAL with {probability_of_accuracy*100:.2f}% probability of accuracy"
 
 # predicted_label = predict_label(weights, df) function calling
 #print("Predicted label:", predicted_label)
