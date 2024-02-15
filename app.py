@@ -25,18 +25,6 @@ lg_war = lib.setup_logger("WEB_APP",log_file , level=lib.logging.WARNING)
 def index():
     return render_template('index.html')
 
-@app.route('/about-project')
-def about_project():
-    return render_template('about-project.html')
-
-@app.route('/about-team')
-def about_team():
-    return render_template('about-team.html')
-
-@app.route('/upload-page')
-def upload():
-    return render_template('upload-page.html')
-
 @app.route('/upload', methods=['POST'])
 def upload_file():
     with open('logs/upload_flag.txt', 'w') as fp:
@@ -60,7 +48,7 @@ def upload_file():
     except Exception as e:
         lg_err.error(f'File uploaded FAILED{e}')
         return f'Error: {str(e)}'
-    
+
 @app.route('/result', methods=['POST' , 'GET'])
 def result():
     if os.path.exists('logs/upload_flag.txt') == True:
@@ -79,8 +67,7 @@ def result():
     else:
         lg_err.error(f"Classification FAILED : {file}")
         return render_template('result.html',data=data)
-    
-    
+
 if __name__ == '__main__':
     if not os.path.exists(LOGS):
         os.makedirs(LOGS)
