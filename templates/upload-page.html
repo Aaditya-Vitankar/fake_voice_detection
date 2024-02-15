@@ -188,7 +188,7 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            margin: 10px;
+            margin: 0;
             padding: 0;
             font-family: 'Arial', sans-serif;
             color: #333;
@@ -202,33 +202,80 @@
         <a href="/about-project" class="navelement w-nav-link">About Project</a>
         <a href="/about-team" class="navelement w-nav-link">About Team</a>
     </div>
-        <a href="/upload-page"><button>Upload Again</button></a>
-        <!-- <h5>{{data}}</h5> -->
-        {% if "Audio is Real" == data %}
-            <h2 class="real">{{data}}</h2>
     
-        {% elif "Audio is Fake" == data %}
-    
-            <h2 class="fake">{{data}}</h2>
-        {% elif "Audio Seems Real with" in data %}
-            <h2 class="not_sure">{{data}}</h2>
-    
-        {% elif "Audio Seems Fake with" in data %}
-            <h2 class="not_sure">{{data}}</h2>
-    
-        {% elif "unsupported Format" == data %}
-            <h2 class="unsupported_format">Unsupported Please Upload either "Mp3" or "wav" file</h2>
+    <div id="drop-area" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+        <p id="file-info">Drag and drop a file here or click to select a file</p>
+        <!-- Browse button -->
+        <label for="file-input" id="browse-button">Browse</label>
+        <input type="file" id="file-input" style="display: none;" onchange="handleFile(this.files)">
+    </div>
+
+    <div class="overlay" style="display: none;">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Process button outside drop-area -->
+    <button id="process-button" onclick="processFiles();  showLoading();">Process</button>
+
+    <script>
+        function dropHandler(event) {
+            event.preventDefault();
+            var files = event.dataTransfer.files;
+            handleFiles(files);
+        }
+
+        function dragOverHandler(event) {
+            event.preventDefault();
+        }
+
+        function handleFile(files) {
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            for (var i = 0; i < files.length; i++) {
+                uploadFile(files[i]);
+            }
+        }
+
+        function displayFileName(fileName) {
+            var fileInfo = document.getElementById('file-info');
+            fileInfo.textContent = fileName;
+        }
+
+        function processFiles() {
+            window.location.href = '/result'; // Redirect to the /process route
+        }
+
+        function showLoading() {
+            document.querySelector('.overlay').style.display = 'flex';
+            // document.querySelector('body').classList.add('loading');
+        }
+
         
-        {% elif "File Length is Small" == data %}
-            <h2 class="too_short">File Length is Smaller than "Seven" Seconds. Please Upload Audio with length more than "Seven Seconds"</h2>
-        
-        {% elif "Please Upload a File" == data %}
-            <h2 class="nothing_found">Please Upload a File</h2>
-    
-        {% else %}
-        <h2 class="nothing_found">Unexpected Exception Occured</h2>
-            
-        {% endif %}
-    </body>
+
+        function uploadFile(file) {
+            displayFileName('File Uploading...')
+            var formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(message => {
+                if (message.startsWith('Error')) {
+                    alert(message);
+                } else {
+                    console.log(message);
+                    displayFileName(file.name);  // Update the file name only on successful upload
+                    // You can choose to perform additional actions on successful upload
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
 </html>
 
